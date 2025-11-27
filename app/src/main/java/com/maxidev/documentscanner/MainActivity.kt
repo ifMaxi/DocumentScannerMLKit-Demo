@@ -18,10 +18,11 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DocumentScanner
 import androidx.compose.material.icons.filled.Folder
@@ -63,6 +64,7 @@ class MainActivity : ComponentActivity() {
     private val scanner = GmsDocumentScanning.getClient(documentScannerOptions())
     private val createDocumentContract = ActivityResultContracts.CreateDocument("application/pdf")
     private val intentSenderContract = ActivityResultContracts.StartIntentSenderForResult()
+    private val openDocumentContract = ActivityResultContracts.OpenDocument()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -133,7 +135,7 @@ class MainActivity : ComponentActivity() {
                  * Launcher for opening the folder.
                  */
                 val openDocument = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.OpenDocument(),
+                    contract = openDocumentContract,
                     onResult = { uri ->
                         uri?.let {
                             val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -191,7 +193,7 @@ class MainActivity : ComponentActivity() {
 private fun ScreenContent(
     modifier: Modifier = Modifier,
     scannedImages: List<Uri>,
-    lazyList: LazyListState = rememberLazyListState(),
+    lazyList: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
     onScan: () -> Unit,
     onOpenFolder: () -> Unit
 ) {
@@ -222,28 +224,30 @@ private fun ScreenContent(
             )
         }
     ) { innerPadding ->
-        LazyColumn(
-            modifier = modifier
-                .fillMaxSize()
-                .consumeWindowInsets(innerPadding),
-            contentPadding = innerPadding,
-            state = lazyList,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            if (scannedImages.isEmpty()) {
-                item {
-                    Box(
-                        modifier = Modifier.padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Here you will see a list of recently scanned images.",
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-            } else {
+        if (scannedImages.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .consumeWindowInsets(innerPadding),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Here you will see a list of recently scanned images.",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        } else {
+            LazyVerticalStaggeredGrid(
+                modifier = modifier
+                    .fillMaxSize()
+                    .consumeWindowInsets(innerPadding),
+                contentPadding = innerPadding,
+                state = lazyList,
+                verticalItemSpacing = 8.dp,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                columns = StaggeredGridCells.Adaptive(160.dp)
+            ) {
                 items(items = scannedImages) { index ->
                     ImagePdf(image = index)
                 }
