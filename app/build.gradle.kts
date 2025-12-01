@@ -56,7 +56,6 @@ dependencies {
 
     // Ksp
     ksp(libs.hilt.android.compiler)
-    ksp(libs.androidx.room.compiler)
 
     // Core
     implementation(libs.androidx.core.ktx)
@@ -74,7 +73,6 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.ui.text.google.fonts)
 
     // Material 3
     implementation(libs.androidx.material3)
@@ -82,17 +80,6 @@ dependencies {
 
     // ML Kit
     implementation(libs.play.services.mlkit.document.scanner)
-
-    // Data Store
-    implementation(libs.androidx.datastore.preferences)
-
-    // Navigation
-    implementation(libs.androidx.navigation3.runtime)
-    implementation(libs.androidx.navigation3.ui)
-
-    // Room Database
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
 
     // Hilt
     implementation(libs.androidx.hilt.navigation.compose)
